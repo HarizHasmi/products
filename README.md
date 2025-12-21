@@ -1,3 +1,101 @@
+## Installation & Setup
+1. Clone the repository
+    git clone https://github.com/HarizHasmi/products.git
+    cd product
+
+2. Install dependencies
+    composer install
+
+3. Create .env file
+    cp .env.example .env
+
+4. Configure database (PostgreSQL)
+    Update your .env:
+        DB_CONNECTION=pgsql
+        DB_HOST=127.0.0.1
+        DB_PORT=5432
+        DB_DATABASE=product_db
+        DB_USERNAME=postgres
+        DB_PASSWORD=your_password
+
+5. Generate app key
+    php artisan key:generate
+
+6. Run migrations
+    php artisan migrate
+
+7. Start the server
+    If using Herd, your project will be available at:
+        http://product.test
+
+    Otherwise:
+        php artisan serve
+
+## API Endpoints
+
+1. GET /api/products
+    List all products
+    Response: 200 OK
+
+2. GET /api/products/{id}
+    Get a single product
+    Response:
+        - 200 OK
+        - 404 Not Found if missing
+
+3. POST /api/products
+    Create a new product
+    Body:
+    {
+    "name": "Laptop",
+    "description": "High performance",
+    "price": 1999.99,
+    "stock": 10
+    }
+    Response: 201 Created
+    Validation errors: 422 Unprocessable Entity
+
+4. PUT /api/products/{id}
+    Update an existing product
+    Response:
+        - 200 OK
+        - 404 Not Found
+        - 422 Validation Error
+
+5. DELETE /api/products/{id}
+    Delete a product
+    Response:
+        - 200 OK
+        - 404 Not Found
+
+## Testing the API
+You can test using Bruno: http://products.test/api/products/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
