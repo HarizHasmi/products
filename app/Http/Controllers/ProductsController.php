@@ -8,77 +8,66 @@ use Illuminate\Http\Request;
 class ProductsController extends Controller
 {
     // GET /api/products
-    public function index()
-    {
-        return response()->json(Product::all(), 200);
+    public function index(){
+        $products = Product::all();
+        return response()->json($products, 200);
     }
 
     // GET /api/products/{id}
-    public function show($id)
-    {
-        $product = Product::find($id);
+    public function show($id){
+        $product = Product::findOrFail($id);
 
-        if (!$product) {
-            return response()->json([
-                'message' => 'Product not found'
-            ], 404);
-        }
-
-        return response()->json($product, 200);
+        return response()->json([
+            'success' => true,
+            'data' => $product
+        ], 200);
     }
 
     // POST /api/products
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price'       => 'required|numeric',
-            'stock'       => 'required|integer|min:0',
-            'description' => 'nullable|string'
+            'stock'       => 'integer|min:0'
         ]);
 
         $product = Product::create($validated);
 
-        return response()->json($product, 201);
+        return response()->json([
+            'success' => true,
+            'data' => $product
+        ], 201);
     }
 
     // PUT /api/products/{id}
-    public function update(Request $request, $id)
-    {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json([
-                'message' => 'Product not found'
-            ], 404);
-        }
+    public function update(Request $request, $id){
+        $product = Product::findOrFail($id);
 
         $validated = $request->validate([
-            'name'        => 'sometimes|required|string|max:255',
-            'price'       => 'sometimes|required|numeric',
-            'stock'       => 'sometimes|required|integer|min:0',
-            'description' => 'nullable|string'
+            'name'        => 'string|max:255',
+            'description' => 'string',
+            'price'       => 'numeric',
+            'stock'       => 'integer|min:0'
         ]);
 
         $product->update($validated);
 
-        return response()->json($product, 200);
+        return response()->json([
+            'success' => true,
+            'data' => $product
+        ], 200);
     }
 
     // DELETE /api/products/{id}
     public function destroy($id)
     {
-        $product = Product::find($id);
-
-        if (!$product) {
-            return response()->json([
-                'message' => 'Product not found'
-            ], 404);
-        }
+        $product = Product::findOrFail($id);
 
         $product->delete();
 
         return response()->json([
+            'succes' => true,
             'message' => 'Product deleted successfully'
         ], 200);
     }
