@@ -1,7 +1,10 @@
-## Installation & Setup
+Products API
+
+**Installation & Setup**
+
 1. Clone the repository
     git clone https://github.com/HarizHasmi/products.git
-    cd product
+    cd products
 
 2. Install dependencies
     composer install
@@ -10,66 +13,164 @@
     cp .env.example .env
 
 4. Configure database (PostgreSQL)
-    Update your .env:
-        DB_CONNECTION=pgsql
-        DB_HOST=127.0.0.1
-        DB_PORT=5432
-        DB_DATABASE=product_db
-        DB_USERNAME=postgres
-        DB_PASSWORD=your_password
+    Update your .env file with the following values:
 
-5. Generate app key
+    DB_CONNECTION=pgsql
+    DB_HOST=127.0.0.1
+    DB_PORT=5432
+    DB_DATABASE=product_db
+    DB_USERNAME=postgres
+    DB_PASSWORD=your_password
+
+5. Generate application key
     php artisan key:generate
 
-6. Run migrations
-    php artisan migrate
+**Database Migration & Seeding (IMPORTANT)**
 
-7. Start the server
-    If using Herd, your project will be available at:
-        http://product.test
+This project uses Spatie Laravel Permission for role-based access control.
 
-    Otherwise:
-        php artisan serve
+To create all database tables and seed roles, permissions, users, and products, run:
 
-## API Endpoints
+php artisan migrate:fresh --seed
+
+This command will:
+
+- Run all migrations
+- Create permission-related tables
+- Seed roles: admin, staff, viewer
+- Seed permissions:
+    - products-view
+    - products-create
+    - products-update
+    - products-delete
+- Assign permissions to roles
+- Create sample users and products
+
+WARNING:
+migrate:fresh will delete all existing data.
+Use only in development.
+
+**Reset Permission Cache (REQUIRED)**
+
+Spatie caches roles and permissions.
+After seeding, always reset the permission cache:
+
+php artisan permission:cache-reset
+
+If the cache is not cleared, permission checks may fail.
+
+**Default Seeded Users**
+
+Admin
+Email: admin@gmail.com
+Password: password
+
+Staff
+Email: staff@gmail.com
+Password: password
+
+Viewer
+Email: viewer@gmail.com
+Password: password
+
+**Start the Server**
+
+If using Laravel Herd, access the project at:
+http://products.test
+
+Otherwise, run:
+php artisan serve
+
+**Authentication Endpoints**
+
+All authentication routes are prefixed with /api/auth
+
+POST /api/auth/login
+Login and receive an authentication token
+
+POST /api/auth/register
+Register a new user (default role: viewer)
+
+GET /api/auth/me
+Get authenticated user details (requires token)
+
+POST /api/auth/logout
+Logout the authenticated user (requires token)
+
+Authorization Header Format:
+Authorization: Bearer {token}
+
+**API Endpoints (Products)**
+
+All product endpoints:
+
+- Require authentication
+- Enforce permissions using Spatie Laravel Permission
 
 1. GET /api/products
     List all products
+    Permission required: products-view
+    
     Response: 200 OK
 
 2. GET /api/products/{id}
     Get a single product
-    Response:
-        - 200 OK
-        - 404 Not Found if missing
+    Permission required: products-view
+    
+    Responses:
+    - 200 OK
+    - 404 Not Found
 
 3. POST /api/products
     Create a new product
-    Body:
+    Permission required: products-create
+
+    Request body example:
     {
     "name": "Laptop",
     "description": "High performance",
     "price": 1999.99,
     "stock": 10
     }
-    Response: 201 Created
-    Validation errors: 422 Unprocessable Entity
+
+    Responses:
+    - 201 Created
+    - 422 Validation Error
 
 4. PUT /api/products/{id}
     Update an existing product
-    Response:
-        - 200 OK
-        - 404 Not Found
-        - 422 Validation Error
+    Permission required: products-update
+
+    Responses:
+    - 200 OK
+    - 404 Not Found
+    - 422 Validation Error
 
 5. DELETE /api/products/{id}
     Delete a product
-    Response:
-        - 200 OK
-        - 404 Not Found
+    Permission required: products-delete
 
-## Testing the API
-You can test using Bruno: http://products.test/api/products/
+    Responses:
+    - 200 OK
+    - 404 Not Found
+
+**Testing the API**
+
+You can test the API using Bruno:
+http://products.test/api/products
+
+Steps:
+
+1. Login to get a token
+2. Copy the token
+3. Add Authorization header to requests
+
+**Notes**
+- User roles are stored in the model_has_roles table
+- Role definitions are stored in the roles table
+- Permissions are cached by Spatie
+- user_id on products is enforced (NOT NULL)
+- PostgreSQL is the recommended database
 
 
 
